@@ -3,9 +3,22 @@
 [![Core laws proved in Lean 4](docs/badges/lean-laws.svg)](lean/GAM/Theorems/Consequences.lean)
 [![Kernel step and replay verified](docs/badges/kernel.svg)](lean/GAM/Kernel.lean)
 
-The Governed Act Model (GAM) describes how a system turns a proposal into an authorized consequence and remains accountable for the outcome. A person, a service or an AI agent can make the proposal. The model applies wherever a domain controls the power to act.
+The Governed Act Model (GAM) governs how a person, a service or an AI agent can turn a proposal into an action. A **Mandate** says who may act and within what limits. **Evidence** supports the facts the decision depends on. If the proposal meets those conditions, the system records an **Act** before it can release the action to an executor. A **Duty** tracks what someone still needs to resolve.
 
-A refund illustrates the four forms. A **Mandate** gives a merchant the right to refund an order within a limit. **Evidence** establishes what the customer approved. An **Act** records the exact refund and commits the funds before the executor can contact the bank. If the connection drops after submission, a **Duty** keeps the case open. A later receipt can support a closing decision, even after the mandate has been revoked. [Read the manifesto](MANIFESTO.md) · [Original publication](https://spectre.guide/en/governed-act-model)
+### How a refund works
+
+Suppose a merchant has a €100 limit per refund. A customer approves a €50 refund. GAM checks the merchant’s mandate and the approval for that exact payment.
+
+```mermaid
+flowchart TD
+    proposal["Propose a €50 refund"] --> check{"Do the Mandate and Evidence cover it?"}
+    check -->|No| stop["Refuse the proposal"]
+    check -->|Yes| act["Record the Act for this refund"]
+    act -->|If still authorized| attempt["Allow the executor to contact the bank"]
+    attempt --> duty["Open a Duty to reconcile the payment"]
+```
+
+If the bank connection drops, the Duty stays open. A matching bank receipt can later justify a closing Act. If the outcome remains unknown, an authorized independent reviewer can record who accepts the loss. [Runnable refund example](examples/payments/late_receipt.json) · [Read the manifesto](MANIFESTO.md) · [Original publication](https://spectre.guide/en/governed-act-model)
 
 ## What Lean proves
 
