@@ -1,0 +1,22 @@
+{
+  "description": "Two different Acts may use the last unit exactly. Rejection of a third preserves the balance.",
+  "bindings": [
+    ["scope", {"domain": "market", "operation": "refund", "target": "order/39", "purpose": "return", "executor": "cashier"}],
+    ["root", {"id": 0, "holder": "store", "scope": {"$ref": "scope"}, "ceiling": 100, "ancestors": []}],
+    ["second", {"id": 2, "proposer": "store", "mandate": {"$ref": "root"}, "scope": {"$ref": "scope"}, "cost": 50}],
+    ["third", {"id": 3, "proposer": "store", "mandate": {"$ref": "root"}, "scope": {"$ref": "scope"}, "cost": 1}],
+    ["refund", {"id": 1, "proposer": "store", "mandate": {"$ref": "root"}, "scope": {"$ref": "scope"}, "cost": 50}]
+  ],
+  "input": {
+    "genesis": {"root": {"$ref": "root"}, "budget": 100, "controller": "board", "approver": "customer", "observer": "bank", "reviewer": "auditor", "independentOf": ["store", "assistant", "cashier"]},
+    "commands": [
+      {"attest": {"actor": "customer", "fact": {"consent": {"request": {"$ref": "refund"}}}}},
+      {"commit": {"act": {"admit": {"request": {"$ref": "refund"}}}}},
+      {"attest": {"actor": "customer", "fact": {"consent": {"request": {"$ref": "second"}}}}},
+      {"commit": {"act": {"admit": {"request": {"$ref": "second"}}}}},
+      {"attest": {"actor": "customer", "fact": {"consent": {"request": {"$ref": "third"}}}}},
+      {"commit": {"act": {"admit": {"request": {"$ref": "third"}}}}}
+    ]
+  },
+  "expect": {"accepted": [true, true, true, true, true, false], "spent": 100, "openDuties": [], "policyLimit": 100}
+}

@@ -1,0 +1,24 @@
+{
+  "description": "Reusing consent for changed cost or target and replaying a spent admission are rejected.",
+  "bindings": [
+    ["scope", {"domain": "market", "operation": "refund", "target": "order/39", "purpose": "return", "executor": "cashier"}],
+    ["root", {"id": 0, "holder": "store", "scope": {"$ref": "scope"}, "ceiling": 100, "ancestors": []}],
+    ["changed", {"id": 1, "proposer": "store", "mandate": {"$ref": "root"}, "scope": {"$ref": "scope"}, "cost": 51}],
+    ["shift", {"domain": "market", "operation": "refund", "target": "order/78", "purpose": "return", "executor": "cashier"}],
+    ["redirect", {"id": 1, "proposer": "store", "mandate": {"$ref": "root"}, "scope": {"$ref": "shift"}, "cost": 50}],
+    ["refund", {"id": 1, "proposer": "store", "mandate": {"$ref": "root"}, "scope": {"$ref": "scope"}, "cost": 50}]
+  ],
+  "input": {
+    "genesis": {"root": {"$ref": "root"}, "budget": 100, "controller": "board", "approver": "customer", "observer": "bank", "reviewer": "auditor", "independentOf": ["store", "assistant", "cashier"]},
+    "commands": [
+      {"attest": {"actor": "customer", "fact": {"consent": {"request": {"$ref": "refund"}}}}},
+      {"commit": {"act": {"admit": {"request": {"$ref": "changed"}}}}},
+      {"commit": {"act": {"admit": {"request": {"$ref": "redirect"}}}}},
+      {"commit": {"act": {"admit": {"request": {"$ref": "refund"}}}}},
+      {"commit": {"act": {"admit": {"request": {"$ref": "refund"}}}}},
+      {"enable": {"executor": "cashier", "request": {"$ref": "refund"}}},
+      {"enable": {"executor": "cashier", "request": {"$ref": "refund"}}}
+    ]
+  },
+  "expect": {"accepted": [true, false, false, true, false, true, false], "spent": 50, "openDuties": [1], "policyLimit": 100}
+}

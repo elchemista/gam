@@ -1,0 +1,21 @@
+{
+  "description": "Root and delegate share the same account. The second admission would spend 110 of 100.",
+  "bindings": [
+    ["scope", {"domain": "market", "operation": "refund", "target": "order/39", "purpose": "return", "executor": "cashier"}],
+    ["root", {"id": 0, "holder": "store", "scope": {"$ref": "scope"}, "ceiling": 100, "ancestors": []}],
+    ["child", {"id": 1, "holder": "assistant", "scope": {"$ref": "scope"}, "ceiling": 60, "ancestors": [0]}],
+    ["small", {"id": 2, "proposer": "assistant", "mandate": {"$ref": "child"}, "scope": {"$ref": "scope"}, "cost": 60}],
+    ["refund", {"id": 1, "proposer": "store", "mandate": {"$ref": "root"}, "scope": {"$ref": "scope"}, "cost": 50}]
+  ],
+  "input": {
+    "genesis": {"root": {"$ref": "root"}, "budget": 100, "controller": "board", "approver": "customer", "observer": "bank", "reviewer": "auditor", "independentOf": ["store", "assistant", "cashier"]},
+    "commands": [
+      {"commit": {"act": {"grant": {"actor": "store", "parent": {"$ref": "root"}, "child": {"$ref": "child"}}}}},
+      {"attest": {"actor": "customer", "fact": {"consent": {"request": {"$ref": "refund"}}}}},
+      {"commit": {"act": {"admit": {"request": {"$ref": "refund"}}}}},
+      {"attest": {"actor": "customer", "fact": {"consent": {"request": {"$ref": "small"}}}}},
+      {"commit": {"act": {"admit": {"request": {"$ref": "small"}}}}}
+    ]
+  },
+  "expect": {"accepted": [true, true, true, true, false], "spent": 50, "openDuties": [], "policyLimit": 100}
+}

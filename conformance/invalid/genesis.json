@@ -1,0 +1,13 @@
+{
+  "description": "The reviewer cannot certify independence from itself.",
+  "bindings": [
+    ["scope", {"domain": "market", "operation": "refund", "target": "order/39", "purpose": "return", "executor": "cashier"}],
+    ["root", {"id": 0, "holder": "store", "scope": {"$ref": "scope"}, "ceiling": 100, "ancestors": []}]
+  ],
+  "input": {
+    "genesis": {"root": {"$ref": "root"}, "budget": 100, "controller": "board", "approver": "customer", "observer": "bank", "reviewer": "auditor", "independentOf": ["auditor"]},
+    "commands": [
+    ]
+  },
+  "expect": {"error": "invalid Genesis"}
+}

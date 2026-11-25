@@ -1,0 +1,14 @@
+{
+  "description": "Unmodeled fields are rejected before command evaluation.",
+  "bindings": [
+    ["scope", {"domain": "market", "operation": "refund", "target": "order/39", "purpose": "return", "executor": "cashier"}],
+    ["root", {"id": 0, "holder": "store", "scope": {"$ref": "scope"}, "ceiling": 100, "ancestors": []}]
+  ],
+  "input": {
+    "genesis": {"root": {"$ref": "root"}, "budget": 100, "controller": "board", "approver": "customer", "observer": "bank", "reviewer": "auditor", "independentOf": ["store", "assistant", "cashier"]},
+    "commands": [
+      {"commit": {"act": {"restrict": {"actor": "board", "limit": 20, "exception": true}}}}
+    ]
+  },
+  "expect": {"error": "input contains unrecognized fields or values"}
+}

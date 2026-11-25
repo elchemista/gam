@@ -1,0 +1,10 @@
+name = "gam"
+version = "0.1.0"
+defaultTargets = ["GAM", "gam-run"]
+
+[[lean_lib]]
+name = "GAM"
+
+[[lean_exe]]
+name = "gam-run"
+root = "Main"

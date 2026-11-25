@@ -1,0 +1,13 @@
+{
+  "description": "A valid empty history starts with an unspent shared account.",
+  "bindings": [
+    ["scope", {"domain": "market", "operation": "refund", "target": "order/39", "purpose": "return", "executor": "cashier"}],
+    ["root", {"id": 0, "holder": "store", "scope": {"$ref": "scope"}, "ceiling": 100, "ancestors": []}]
+  ],
+  "input": {
+    "genesis": {"root": {"$ref": "root"}, "budget": 100, "controller": "board", "approver": "customer", "observer": "bank", "reviewer": "auditor", "independentOf": ["store", "assistant", "cashier"]},
+    "commands": [
+    ]
+  },
+  "expect": {"accepted": [], "spent": 0, "openDuties": [], "policyLimit": 100}
+}

@@ -1,0 +1,22 @@
+{
+  "description": "A foreign request is submitted to a receiving domain. Only a local request with local consent succeeds.",
+  "bindings": [
+    ["scope", {"domain": "market", "operation": "refund", "target": "order/39", "purpose": "return", "executor": "cashier"}],
+    ["root", {"id": 0, "holder": "store", "scope": {"$ref": "scope"}, "ceiling": 100, "ancestors": []}],
+    ["other", {"domain": "wholesale", "operation": "refund", "target": "order/39", "purpose": "return", "executor": "cashier"}],
+    ["foreignRoot", {"id": 0, "holder": "store", "scope": {"$ref": "other"}, "ceiling": 100, "ancestors": []}],
+    ["foreign", {"id": 1, "proposer": "store", "mandate": {"$ref": "foreignRoot"}, "scope": {"$ref": "other"}, "cost": 50}],
+    ["refund", {"id": 1, "proposer": "store", "mandate": {"$ref": "root"}, "scope": {"$ref": "scope"}, "cost": 50}]
+  ],
+  "input": {
+    "genesis": {"root": {"$ref": "root"}, "budget": 100, "controller": "board", "approver": "customer", "observer": "bank", "reviewer": "auditor", "independentOf": ["store", "assistant", "cashier"]},
+    "commands": [
+      {"attest": {"actor": "customer", "fact": {"consent": {"request": {"$ref": "foreign"}}}}},
+      {"commit": {"act": {"admit": {"request": {"$ref": "foreign"}}}}},
+      {"enable": {"executor": "cashier", "request": {"$ref": "foreign"}}},
+      {"attest": {"actor": "customer", "fact": {"consent": {"request": {"$ref": "refund"}}}}},
+      {"commit": {"act": {"admit": {"request": {"$ref": "refund"}}}}}
+    ]
+  },
+  "expect": {"accepted": [false, false, false, true, true], "spent": 50, "openDuties": [], "policyLimit": 100}
+}

@@ -1,0 +1,24 @@
+{
+  "description": "Genuine consent cannot create authority for an unissued mandate, an enlarged scope or a false holder.",
+  "bindings": [
+    ["scope", {"domain": "market", "operation": "refund", "target": "order/39", "purpose": "return", "executor": "cashier"}],
+    ["root", {"id": 0, "holder": "store", "scope": {"$ref": "scope"}, "ceiling": 100, "ancestors": []}],
+    ["child", {"id": 1, "holder": "assistant", "scope": {"$ref": "scope"}, "ceiling": 60, "ancestors": [0]}],
+    ["forged", {"id": 1, "proposer": "assistant", "mandate": {"$ref": "child"}, "scope": {"$ref": "scope"}, "cost": 50}],
+    ["badScope", {"domain": "market", "operation": "refund", "target": "order/39", "purpose": "gift", "executor": "cashier"}],
+    ["redirect", {"id": 2, "proposer": "store", "mandate": {"$ref": "root"}, "scope": {"$ref": "badScope"}, "cost": 50}],
+    ["impostor", {"id": 3, "proposer": "assistant", "mandate": {"$ref": "root"}, "scope": {"$ref": "scope"}, "cost": 50}]
+  ],
+  "input": {
+    "genesis": {"root": {"$ref": "root"}, "budget": 100, "controller": "board", "approver": "customer", "observer": "bank", "reviewer": "auditor", "independentOf": ["store", "assistant", "cashier"]},
+    "commands": [
+      {"attest": {"actor": "customer", "fact": {"consent": {"request": {"$ref": "forged"}}}}},
+      {"commit": {"act": {"admit": {"request": {"$ref": "forged"}}}}},
+      {"attest": {"actor": "customer", "fact": {"consent": {"request": {"$ref": "redirect"}}}}},
+      {"commit": {"act": {"admit": {"request": {"$ref": "redirect"}}}}},
+      {"attest": {"actor": "customer", "fact": {"consent": {"request": {"$ref": "impostor"}}}}},
+      {"commit": {"act": {"admit": {"request": {"$ref": "impostor"}}}}}
+    ]
+  },
+  "expect": {"accepted": [true, false, true, false, true, false], "spent": 0, "openDuties": [], "policyLimit": 100}
+}

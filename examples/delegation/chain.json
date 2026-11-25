@@ -1,0 +1,21 @@
+{
+  "description": "Two delegations narrow the per-act ceiling. The final holder proposes within it.",
+  "bindings": [
+    ["scope", {"domain": "market", "operation": "refund", "target": "order/39", "purpose": "return", "executor": "cashier"}],
+    ["root", {"id": 0, "holder": "store", "scope": {"$ref": "scope"}, "ceiling": 100, "ancestors": []}],
+    ["child", {"id": 1, "holder": "assistant", "scope": {"$ref": "scope"}, "ceiling": 60, "ancestors": [0]}],
+    ["grand", {"id": 2, "holder": "counter", "scope": {"$ref": "scope"}, "ceiling": 25, "ancestors": [1, 0]}],
+    ["small", {"id": 2, "proposer": "counter", "mandate": {"$ref": "grand"}, "scope": {"$ref": "scope"}, "cost": 25}]
+  ],
+  "input": {
+    "genesis": {"root": {"$ref": "root"}, "budget": 100, "controller": "board", "approver": "customer", "observer": "bank", "reviewer": "auditor", "independentOf": ["store", "assistant", "cashier"]},
+    "commands": [
+      {"commit": {"act": {"grant": {"actor": "store", "parent": {"$ref": "root"}, "child": {"$ref": "child"}}}}},
+      {"commit": {"act": {"grant": {"actor": "assistant", "parent": {"$ref": "child"}, "child": {"$ref": "grand"}}}}},
+      {"attest": {"actor": "customer", "fact": {"consent": {"request": {"$ref": "small"}}}}},
+      {"commit": {"act": {"admit": {"request": {"$ref": "small"}}}}},
+      {"enable": {"executor": "cashier", "request": {"$ref": "small"}}}
+    ]
+  },
+  "expect": {"accepted": [true, true, true, true, true], "spent": 25, "openDuties": [2], "policyLimit": 100}
+}

@@ -1,0 +1,21 @@
+{
+  "description": "Inflation, a false holder, id reuse and a forged lineage each fail.",
+  "bindings": [
+    ["scope", {"domain": "market", "operation": "refund", "target": "order/39", "purpose": "return", "executor": "cashier"}],
+    ["root", {"id": 0, "holder": "store", "scope": {"$ref": "scope"}, "ceiling": 100, "ancestors": []}],
+    ["child", {"id": 1, "holder": "assistant", "scope": {"$ref": "scope"}, "ceiling": 60, "ancestors": [0]}],
+    ["large", {"id": 2, "holder": "assistant", "scope": {"$ref": "scope"}, "ceiling": 101, "ancestors": [0]}],
+    ["fake", {"id": 3, "holder": "accomplice", "scope": {"$ref": "scope"}, "ceiling": 5, "ancestors": [0]}]
+  ],
+  "input": {
+    "genesis": {"root": {"$ref": "root"}, "budget": 100, "controller": "board", "approver": "customer", "observer": "bank", "reviewer": "auditor", "independentOf": ["store", "assistant", "cashier"]},
+    "commands": [
+      {"commit": {"act": {"grant": {"actor": "store", "parent": {"$ref": "root"}, "child": {"$ref": "large"}}}}},
+      {"commit": {"act": {"grant": {"actor": "assistant", "parent": {"$ref": "root"}, "child": {"$ref": "child"}}}}},
+      {"commit": {"act": {"grant": {"actor": "store", "parent": {"$ref": "root"}, "child": {"$ref": "child"}}}}},
+      {"commit": {"act": {"grant": {"actor": "store", "parent": {"$ref": "root"}, "child": {"$ref": "child"}}}}},
+      {"commit": {"act": {"grant": {"actor": "assistant", "parent": {"$ref": "child"}, "child": {"$ref": "fake"}}}}}
+    ]
+  },
+  "expect": {"accepted": [false, false, true, false, false], "spent": 0, "openDuties": [], "policyLimit": 100}
+}

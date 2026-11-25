@@ -1,0 +1,13 @@
+{
+  "description": "A root must have no parent.",
+  "bindings": [
+    ["scope", {"domain": "market", "operation": "refund", "target": "order/39", "purpose": "return", "executor": "cashier"}],
+    ["fakeRoot", {"id": 9, "holder": "store", "scope": {"$ref": "scope"}, "ceiling": 100, "ancestors": [0]}]
+  ],
+  "input": {
+    "genesis": {"root": {"$ref": "fakeRoot"}, "budget": 100, "controller": "board", "approver": "customer", "observer": "bank", "reviewer": "auditor", "independentOf": ["store", "assistant", "cashier"]},
+    "commands": [
+    ]
+  },
+  "expect": {"error": "invalid Genesis"}
+}

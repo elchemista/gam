@@ -1,0 +1,23 @@
+{
+  "description": "Revoking an ancestor blocks a previously recorded release candidate and new spending.",
+  "bindings": [
+    ["scope", {"domain": "market", "operation": "refund", "target": "order/39", "purpose": "return", "executor": "cashier"}],
+    ["root", {"id": 0, "holder": "store", "scope": {"$ref": "scope"}, "ceiling": 100, "ancestors": []}],
+    ["child", {"id": 1, "holder": "assistant", "scope": {"$ref": "scope"}, "ceiling": 60, "ancestors": [0]}],
+    ["small", {"id": 2, "proposer": "assistant", "mandate": {"$ref": "child"}, "scope": {"$ref": "scope"}, "cost": 60}],
+    ["next", {"id": 3, "proposer": "assistant", "mandate": {"$ref": "child"}, "scope": {"$ref": "scope"}, "cost": 15}]
+  ],
+  "input": {
+    "genesis": {"root": {"$ref": "root"}, "budget": 100, "controller": "board", "approver": "customer", "observer": "bank", "reviewer": "auditor", "independentOf": ["store", "assistant", "cashier"]},
+    "commands": [
+      {"commit": {"act": {"grant": {"actor": "store", "parent": {"$ref": "root"}, "child": {"$ref": "child"}}}}},
+      {"attest": {"actor": "customer", "fact": {"consent": {"request": {"$ref": "small"}}}}},
+      {"commit": {"act": {"admit": {"request": {"$ref": "small"}}}}},
+      {"commit": {"act": {"revoke": {"actor": "board", "mandate": {"$ref": "root"}}}}},
+      {"enable": {"executor": "cashier", "request": {"$ref": "small"}}},
+      {"attest": {"actor": "customer", "fact": {"consent": {"request": {"$ref": "next"}}}}},
+      {"commit": {"act": {"admit": {"request": {"$ref": "next"}}}}}
+    ]
+  },
+  "expect": {"accepted": [true, true, true, true, false, true, false], "spent": 60, "openDuties": [], "policyLimit": 100}
+}

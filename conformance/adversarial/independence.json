@@ -1,0 +1,18 @@
+{
+  "description": "Even the designated reviewer needs independence from the executor.",
+  "bindings": [
+    ["scope", {"domain": "market", "operation": "refund", "target": "order/39", "purpose": "return", "executor": "cashier"}],
+    ["root", {"id": 0, "holder": "store", "scope": {"$ref": "scope"}, "ceiling": 100, "ancestors": []}],
+    ["refund", {"id": 1, "proposer": "store", "mandate": {"$ref": "root"}, "scope": {"$ref": "scope"}, "cost": 50}]
+  ],
+  "input": {
+    "genesis": {"root": {"$ref": "root"}, "budget": 100, "controller": "board", "approver": "customer", "observer": "bank", "reviewer": "auditor", "independentOf": ["store"]},
+    "commands": [
+      {"attest": {"actor": "customer", "fact": {"consent": {"request": {"$ref": "refund"}}}}},
+      {"commit": {"act": {"admit": {"request": {"$ref": "refund"}}}}},
+      {"enable": {"executor": "cashier", "request": {"$ref": "refund"}}},
+      {"commit": {"act": {"dispose": {"actor": "auditor", "duty": {"cause": {"$ref": "refund"}}, "basis": "acceptLoss"}}}}
+    ]
+  },
+  "expect": {"accepted": [true, true, true, false], "spent": 50, "openDuties": [1], "policyLimit": 100}
+}
