@@ -1,5 +1,8 @@
 # Governed Act Model
 
+[![Core laws proved in Lean 4](docs/badges/lean-laws.svg)](lean/GAM/Theorems/Consequences.lean)
+[![Kernel step and replay verified](docs/badges/kernel.svg)](lean/GAM/Kernel.lean)
+
 The Governed Act Model (GAM) describes how a system turns a proposal into an authorized consequence and remains accountable for the outcome. A person, a service or an AI agent can make the proposal. The model applies wherever a domain controls the power to act.
 
 A refund illustrates the four forms. A **Mandate** gives a merchant the right to refund an order within a limit. **Evidence** establishes what the customer approved. An **Act** records the exact refund and commits the funds before the executor can contact the bank. If the connection drops after submission, a **Duty** keeps the case open. A later receipt can support a closing decision, even after the mandate has been revoked. [Read the manifesto](MANIFESTO.md) · [Original publication](https://spectre.guide/en/governed-act-model)
@@ -16,6 +19,12 @@ For every valid Genesis and every finite sequence of admitted transitions in the
 | IV. Duty does not extinguish itself | Find the evidence or independent authority that justified each disposition. Follow an open Duty across any interval that lacks a disposition for it. |
 
 The profile models one domain, one shared account and one family of scoped operations per Genesis. It verifies decisions about release. A deployment must also authenticate identities, commit decisions durably and control every path to the external effect. [Formal scope and integration assumptions](SPECIFICATION.md)
+
+### What the order of events changes
+
+**A valid Act can later be refused release.** Suppose the kernel admits a refund of 50 under a ceiling of 100. If the controller lowers the ceiling to 20 before release, the executor is refused. The history still records a valid admission and 50 units committed. The executor received no capability, so no reconciliation Duty opened. [Runnable policy trace](conformance/adversarial/policy.json)
+
+**The same two receipts can leave a Duty open or closed.** Suppose the bank reports success and later reports failure for the same refund. If both receipts arrive before disposition, the conflict blocks evidence-based closure. If the success receipt justified a closing Act before the failure receipt arrived, the kernel records the late contradiction and keeps the Duty closed. The proof checks the justification available at the time of closure. Reopening a dispute would require an explicit transition. [Duty law](lean/GAM/Laws/Responsibility.lean) · [Receipt and disposition rules](lean/GAM/Transition.lean)
 
 ## Build and run
 
